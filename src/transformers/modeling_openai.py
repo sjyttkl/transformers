@@ -33,9 +33,7 @@ from .modeling_utils import Conv1D, PreTrainedModel, SequenceSummary, prune_conv
 
 logger = logging.getLogger(__name__)
 
-OPENAI_GPT_PRETRAINED_MODEL_ARCHIVE_MAP = {
-    "openai-gpt": "https://s3.amazonaws.com/models.huggingface.co/bert/openai-gpt-pytorch_model.bin"
-}
+OPENAI_GPT_PRETRAINED_MODEL_ARCHIVE_MAP = {"openai-gpt": "https://cdn.huggingface.co/openai-gpt-pytorch_model.bin"}
 
 
 def load_tf_weights_in_openai_gpt(model, config, openai_checkpoint_folder_path):
@@ -315,7 +313,7 @@ OPENAI_GPT_INPUTS_DOCSTRING = r"""
             Mask to nullify selected heads of the self-attention modules.
             Mask values selected in ``[0, 1]``:
             :obj:`1` indicates the head is **not masked**, :obj:`0` indicates the head is **masked**.
-        input_embeds (:obj:`torch.FloatTensor` of shape :obj:`(batch_size, sequence_length, hidden_size)`, `optional`, defaults to :obj:`None`):
+        inputs_embeds (:obj:`torch.FloatTensor` of shape :obj:`(batch_size, sequence_length, hidden_size)`, `optional`, defaults to :obj:`None`):
             Optionally, instead of passing :obj:`input_ids` you can choose to directly pass an embedded representation.
             This is useful if you want more control over how to convert `input_ids` indices into associated vectors
             than the model's internal embedding lookup matrix.
@@ -425,22 +423,7 @@ class OpenAIGPTModel(OpenAIGPTPreTrainedModel):
             attention_mask = (1.0 - attention_mask) * -10000.0
 
         # Prepare head mask if needed
-        # 1.0 in head_mask indicate we keep the head
-        # attention_probs has shape bsz x n_heads x N x N
-        # head_mask has shape n_layer x batch x n_heads x N x N
-        if head_mask is not None:
-            if head_mask.dim() == 1:
-                head_mask = head_mask.unsqueeze(0).unsqueeze(0).unsqueeze(-1).unsqueeze(-1)
-                head_mask = head_mask.expand(self.config.n_layer, -1, -1, -1, -1)
-            elif head_mask.dim() == 2:
-                head_mask = (
-                    head_mask.unsqueeze(1).unsqueeze(-1).unsqueeze(-1)
-                )  # We can specify head_mask for each layer
-            head_mask = head_mask.to(
-                dtype=next(self.parameters()).dtype
-            )  # switch to fload if need + fp16 compatibility
-        else:
-            head_mask = [None] * self.config.n_layer
+        head_mask = self.get_head_mask(head_mask, self.config.n_layer)
 
         if inputs_embeds is None:
             inputs_embeds = self.tokens_embed(input_ids)

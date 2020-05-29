@@ -29,7 +29,7 @@ The smaller BERT models are intended for environments with restricted computatio
 ## Model training
 
 The model was trained on a Tesla P100 GPU and 25GB of RAM.
-The script for fine tuning can be found [here](https://github.com/huggingface/transformers/blob/master/examples/run_squad.py)
+The script for fine tuning can be found [here](https://github.com/huggingface/transformers/blob/master/examples/question-answering/run_squad.py)
 
 ## Results:
 
@@ -37,6 +37,12 @@ The script for fine tuning can be found [here](https://github.com/huggingface/tr
 | ------ | --------- |
 | **EM** | **48.60** |
 | **F1** | **49.73** |
+
+
+| Model                                                                                     | EM        | F1 score  | SIZE (MB) |
+| ----------------------------------------------------------------------------------------- | --------- | --------- | --------- |
+| [bert-tiny-finetuned-squadv2](https://huggingface.co/mrm8488/bert-tiny-finetuned-squadv2) | 48.60     | 49.73     | **16.74** |
+| [bert-tiny-5-finetuned-squadv2](https://huggingface.co/mrm8488/bert-tiny-5-finetuned-squadv2) | **57.12** | **60.86** | 24.34  
 
 ## Model in action
 
